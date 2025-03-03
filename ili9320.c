@@ -2,63 +2,44 @@
   ******************************************************************************
   * @file    ili9320.c
   * @author  MCD Application Team
-  * @version V1.2.2
-  * @date    02-December-2014
   * @brief   This file includes the LCD driver for ILI9320 LCD.
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  * Copyright (c) 2014 STMicroelectronics.
+  * All rights reserved.
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
-  */ 
+  */
 
 /* Includes ------------------------------------------------------------------*/
 #include "ili9320.h"
 
 /** @addtogroup BSP
   * @{
-  */ 
+  */
 
 /** @addtogroup Components
   * @{
-  */ 
-  
+  */
+
 /** @addtogroup ili9320
-  * @brief     This file provides a set of functions needed to drive the 
+  * @brief     This file provides a set of functions needed to drive the
   *            ILI9320 LCD.
   * @{
   */
 
 /** @defgroup ILI9320_Private_TypesDefinitions
   * @{
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup ILI9320_Private_Defines
   * @{
@@ -66,20 +47,20 @@
 
 /**
   * @}
-  */ 
-  
+  */
+
 /** @defgroup ILI9320_Private_Macros
   * @{
   */
-     
+
 /**
   * @}
-  */  
+  */
 
 /** @defgroup ILI9320_Private_Variables
   * @{
-  */ 
-LCD_DrvTypeDef   ili9320_drv = 
+  */
+LCD_DrvTypeDef   ili9320_drv =
 {
   ili9320_Init,
   ili9320_ReadID,
@@ -94,7 +75,7 @@ LCD_DrvTypeDef   ili9320_drv =
   ili9320_GetLcdPixelWidth,
   ili9320_GetLcdPixelHeight,
   ili9320_DrawBitmap,
-  ili9320_DrawRGBImage,  
+  ili9320_DrawRGBImage,
 };
 
 static uint8_t Is_ili9320_Initialized = 0;
@@ -102,19 +83,19 @@ static uint16_t ArrayRGB[320] = {0};
 
 /**
   * @}
-  */ 
-  
+  */
+
 /** @defgroup ILI9320_Private_FunctionPrototypes
   * @{
   */
 
 /**
   * @}
-  */ 
-  
+  */
+
 /** @defgroup ILI9320_Private_Functions
   * @{
-  */   
+  */
 
 /**
   * @brief  Initialise the ILI9320 LCD Component.
@@ -122,13 +103,13 @@ static uint16_t ArrayRGB[320] = {0};
   * @retval None
   */
 void ili9320_Init(void)
-{  
+{
   if(Is_ili9320_Initialized == 0)
   {
     Is_ili9320_Initialized = 1;
     /* Initialise ILI9320 low level bus layer --------------------------------*/
     LCD_IO_Init();
-    
+
     /* Start Initial Sequence ------------------------------------------------*/
     ili9320_WriteReg(LCD_REG_229,0x8000); /* Set the internal vcore voltage */
     ili9320_WriteReg(LCD_REG_0,  0x0001); /* Start internal OSC. */
@@ -171,7 +152,7 @@ void ili9320_Init(void)
     ili9320_WriteReg(LCD_REG_57, 0x0700);
     ili9320_WriteReg(LCD_REG_60, 0x0700);
     ili9320_WriteReg(LCD_REG_61, 0x1F00);
-  
+
     /* Set GRAM area ---------------------------------------------------------*/
     ili9320_WriteReg(LCD_REG_80, 0x0000); /* Horizontal GRAM Start Address */
     ili9320_WriteReg(LCD_REG_81, 0x00EF); /* Horizontal GRAM End Address */
@@ -202,10 +183,10 @@ void ili9320_Init(void)
     /* AM=1 (address is updated in vertical writing direction) */
     ili9320_WriteReg(LCD_REG_3, 0x1018);
 
-    ili9320_WriteReg(LCD_REG_7, 0x0173); /* 262K color and display ON */    
+    ili9320_WriteReg(LCD_REG_7, 0x0173); /* 262K color and display ON */
   }
-  
-  /* Set the Cursor */ 
+
+  /* Set the Cursor */
   ili9320_SetCursor(0, 0);
     
   /* Prepare to write GRAM */
@@ -232,7 +213,7 @@ void ili9320_DisplayOn(void)
 
   ili9320_WriteReg(LCD_REG_19, 0x1d00); /* VDV[4:0] for VCOM amplitude */
   ili9320_WriteReg(LCD_REG_41, 0x0013); /* VCM[4:0] for VCOMH */
- 
+
   /* Display On */
   ili9320_WriteReg(LCD_REG_7, 0x0173); /* 262K color and display ON */
 }
@@ -249,11 +230,11 @@ void ili9320_DisplayOff(void)
   ili9320_WriteReg(LCD_REG_17, 0x0000); /* DC1[2:0], DC0[2:0], VC[2:0] */
   ili9320_WriteReg(LCD_REG_18, 0x0000); /* VREG1OUT voltage */
   ili9320_WriteReg(LCD_REG_19, 0x0000); /* VDV[4:0] for VCOM amplitude*/
-  
+
   ili9320_WriteReg(LCD_REG_41, 0x0000); /* VCM[4:0] for VCOMH */
-  
+
   /* Display Off */
-  ili9320_WriteReg(LCD_REG_7, 0x0); 
+  ili9320_WriteReg(LCD_REG_7, 0x0);
 }
 
 /**
@@ -299,7 +280,7 @@ uint16_t ili9320_ReadID(void)
 void ili9320_SetCursor(uint16_t Xpos, uint16_t Ypos)
 {
   ili9320_WriteReg(LCD_REG_32, Ypos);
-  ili9320_WriteReg(LCD_REG_33, (ILI9320_LCD_PIXEL_WIDTH - 1 - Xpos));      
+  ili9320_WriteReg(LCD_REG_33, (ILI9320_LCD_PIXEL_WIDTH - 1 - Xpos));
 }
 
 /**
@@ -313,7 +294,7 @@ void ili9320_WritePixel(uint16_t Xpos, uint16_t Ypos, uint16_t RGBCode)
 {
   /* Set Cursor */
   ili9320_SetCursor(Xpos, Ypos);
-  
+
   /* Prepare to write GRAM */
   LCD_IO_WriteReg(LCD_REG_34);
 
@@ -330,13 +311,13 @@ uint16_t ili9320_ReadPixel(uint16_t Xpos, uint16_t Ypos)
 {
   /* Set Cursor */
   ili9320_SetCursor(Xpos, Ypos);
-  
+
   /* Prepare to write GRAM */
   LCD_IO_WriteReg(LCD_REG_34);
-  
+
   /* Dummy read */
   LCD_IO_ReadData(0x00);
-  
+
   /* Read 16-bit Reg */
   return (LCD_IO_ReadData(0x00));
 }
@@ -350,7 +331,7 @@ uint16_t ili9320_ReadPixel(uint16_t Xpos, uint16_t Ypos)
 void ili9320_WriteReg(uint8_t LCDReg, uint16_t LCDRegValue)
 {
   LCD_IO_WriteReg(LCDReg);
-  
+
   /* Write 16-bit GRAM Reg */
   LCD_IO_WriteMultipleData((uint8_t*)&LCDRegValue, 2);
 }
@@ -364,7 +345,7 @@ uint16_t ili9320_ReadReg(uint8_t LCDReg)
 {
   /* Write 16-bit Index (then Read Reg) */
   LCD_IO_WriteReg(LCDReg);
-  
+
   /* Read 16-bit Reg */
   return (LCD_IO_ReadData(0x00));
 }
@@ -383,28 +364,28 @@ void ili9320_SetDisplayWindow(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint
   ili9320_WriteReg(LCD_REG_80, (Ypos));
   /* Horizontal GRAM End Address */
   ili9320_WriteReg(LCD_REG_81, (Ypos + Height - 1));
-  
+
   /* Vertical GRAM Start Address */
   ili9320_WriteReg(LCD_REG_82, ILI9320_LCD_PIXEL_WIDTH - Xpos - Width);
   /* Vertical GRAM End Address */
-  ili9320_WriteReg(LCD_REG_83, ILI9320_LCD_PIXEL_WIDTH - Xpos - 1);  
+  ili9320_WriteReg(LCD_REG_83, ILI9320_LCD_PIXEL_WIDTH - Xpos - 1);
 }
 
 /**
   * @brief  Draw vertical line.
-  * @param  RGBCode: Specifies the RGB color   
+  * @param  RGBCode: Specifies the RGB color
   * @param  Xpos:     specifies the X position.
   * @param  Ypos:     specifies the Y position.
-  * @param  Length:   specifies the Line length.  
+  * @param  Length:   specifies the Line length.
   * @retval None
   */
 void ili9320_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length)
 {
   uint16_t counter = 0;
-  
+
   /* Set Cursor */
-  ili9320_SetCursor(Xpos, Ypos); 
-  
+  ili9320_SetCursor(Xpos, Ypos);
+
   /* Prepare to write GRAM */
   LCD_IO_WriteReg(LCD_REG_34);
 
@@ -412,17 +393,17 @@ void ili9320_DrawHLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t 
   for(counter = 0; counter < Length; counter++)
   {
     ArrayRGB[counter] = RGBCode;
-  }  
+  }
 
   LCD_IO_WriteMultipleData((uint8_t*)&ArrayRGB[0], Length * 2);
 }
 
 /**
   * @brief  Draw vertical line.
-  * @param  RGBCode: Specifies the RGB color    
+  * @param  RGBCode: Specifies the RGB color
   * @param  Xpos:     specifies the X position.
   * @param  Ypos:     specifies the Y position.
-  * @param  Length:   specifies the Line length.  
+  * @param  Length:   specifies the Line length.
   * @retval None
   */
 void ili9320_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t Length)
@@ -433,10 +414,10 @@ void ili9320_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t 
   /* I/D=00 (Horizontal : increment, Vertical : decrement) */
   /* AM=1 (address is updated in vertical writing direction) */
   ili9320_WriteReg(LCD_REG_3, 0x1010);
-  
+
   /* Set Cursor */
   ili9320_SetCursor(Xpos, Ypos);
-  
+
   /* Prepare to write GRAM */
   LCD_IO_WriteReg(LCD_REG_34);
 
@@ -445,13 +426,13 @@ void ili9320_DrawVLine(uint16_t RGBCode, uint16_t Xpos, uint16_t Ypos, uint16_t 
   {
     ArrayRGB[counter] = RGBCode;
   }
-  
+
   LCD_IO_WriteMultipleData((uint8_t*)&ArrayRGB[0], Length * 2);
-  
+
   /* set GRAM write direction and BGR = 1 */
   /* I/D=00 (Horizontal : increment, Vertical : decrement) */
   /* AM=1 (address is updated in vertical writing direction) */
-  ili9320_WriteReg(LCD_REG_3, 0x1018);  
+  ili9320_WriteReg(LCD_REG_3, 0x1018);
 }
 
 /**
@@ -478,8 +459,8 @@ void ili9320_DrawBitmap(uint16_t Xpos, uint16_t Ypos, uint8_t *pbmp)
   ili9320_WriteReg(LCD_REG_3, 0x1008);
 
   /* Set Cursor */
-  ili9320_SetCursor(Xpos, Ypos);  
-  
+  ili9320_SetCursor(Xpos, Ypos);
+
   /* Prepare to write GRAM */
   LCD_IO_WriteReg(LCD_REG_34);
  
@@ -507,11 +488,11 @@ void ili9320_DrawRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t
   size = (Xsize * Ysize);
 
   /* Set Cursor */
-  ili9320_SetCursor(Xpos, Ypos);  
-  
+  ili9320_SetCursor(Xpos, Ypos);
+
   /* Prepare to write GRAM */
   LCD_IO_WriteReg(LCD_REG_34);
- 
+
   LCD_IO_WriteMultipleData((uint8_t*)pdata, size*2);
 }
 
@@ -525,10 +506,9 @@ void ili9320_DrawRGBImage(uint16_t Xpos, uint16_t Ypos, uint16_t Xsize, uint16_t
   
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
   */
-  
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+
